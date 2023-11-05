@@ -2,3 +2,5 @@ venv
 *.pyc
 
 __pycache__/
+
+arena_division_b.xml

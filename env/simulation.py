@@ -6,9 +6,8 @@ import numpy as np
 import time
 
 class Simulation:
-	def __init__(self):
-		dirname = os.path.dirname(__file__)
-		env_path = os.path.join(dirname, 'assets', 'arena_division_b.xml')
+	def __init__(self, render, env_path):
+		self.render = render
 
 		self.model = mj.MjModel.from_xml_path(env_path)
 		self.data = mj.MjData(self.model)
@@ -21,7 +20,7 @@ class Simulation:
 		self.lastx = 0
 		self.lasty = 0
 
-		if True:
+		if self.render is True:
 			glfw.init()
 			self.window = glfw.create_window(1200, 900, "RoboCup SSL Simulator", None, None)
 			glfw.make_context_current(self.window)
@@ -101,12 +100,12 @@ class Simulation:
 		mj.set_mjcb_control(self.controller)
 
 		while True:
-			start_time = time.time()
-
-			mj.mj_step(self.model, self.data)
+			for i in range(10):
+				mj.mj_step(self.model, self.data)
+			
 			mj.mjv_updateScene(self.model, self.data, self.opt, None, self.cam, mj.mjtCatBit.mjCAT_ALL.value, self.scene)
 
-			if True:
+			if self.render is True:
 				viewport_width, viewport_height = glfw.get_framebuffer_size(self.window)
 				viewport = mj.MjrRect(0, 0, viewport_width, viewport_height)
 
@@ -114,9 +113,6 @@ class Simulation:
 
 				glfw.swap_buffers(self.window)
 				glfw.poll_events()
-
-			if time.time() - start_time > 30:
-				break
 	
 	def stop(self):
 		glfw.terminate()
