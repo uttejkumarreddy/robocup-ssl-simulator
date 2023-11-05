@@ -5,6 +5,11 @@ import os
 import numpy as np
 
 class SoccerEnvironment(Simulation):
+	def __new__(cls):
+		if not hasattr(cls, 'instance'):
+			cls.instance = super(SoccerEnvironment, cls).__new__(cls)
+		return cls.instance
+
 	def __init__(self, num_players_team_A, num_players_team_B, render = True):
 		dirname = os.path.dirname(__file__)
 		env_path = os.path.join(dirname, 'assets', 'arena_division_b.xml')
