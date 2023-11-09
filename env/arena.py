@@ -56,56 +56,71 @@ class Arena:
 						<joint name="ball" type="free" />
 					</body>
 
-					{TEAM_A_PLAYERS}
+					<body name="A_0" pos="50 0 0.365">
+						<geom name="A_0" type="sphere" size="0.365" rgba="1 0 0 1" mass="200" density="100" />
+						<joint name="A_0" type="free" />
+					</body>
 
-					{TEAM_B_PLAYERS}
+					<body name="A_1" pos="50 2 0.365">
+						<geom name="A_1" type="sphere" size="0.365" rgba="1 0 0 1" mass="200" density="100" />
+						<joint name="A_1" type="free" />
+					</body>
+
+					<body name="A_2" pos="50 4 0.365">
+						<geom name="A_2" type="sphere" size="0.365" rgba="1 0 0 1" mass="200" density="100" />
+						<joint name="A_2" type="free" />
+					</body>
+
+					<body name="A_3" pos="50 -2 0.365">
+						<geom name="A_3" type="sphere" size="0.365" rgba="1 0 0 1" mass="200" density="100" />
+						<joint name="A_3" type="free" />
+					</body>
+
+					<body name="A_4" pos="50 -4 0.365">
+						<geom name="A_4" type="sphere" size="0.365" rgba="1 0 0 1" mass="200" density="100" />
+						<joint name="A_4" type="free" />
+					</body>
+
+					<body name="A_5" pos="50 -6 0.365">
+						<geom name="A_5" type="sphere" size="0.365" rgba="1 0 0 1" mass="200" density="100" />
+						<joint name="A_5" type="free" />
+					</body>
+
+					<body name="B_0" pos="-50 0 0.365">
+						<geom name="B_0" type="sphere" size="0.365" rgba="0 0 1 1" mass="200" density="100" />
+						<joint name="B_0" type="free" />
+					</body>
+
+					<body name="B_1" pos="-50 2 0.365">
+						<geom name="B_1" type="sphere" size="0.365" rgba="0 0 1 1" mass="200" density="100" />
+						<joint name="B_1" type="free" />
+					</body>
+
+					<body name="B_2" pos="-50 4 0.365">
+						<geom name="B_2" type="sphere" size="0.365" rgba="0 0 1 1" mass="200" density="100" />
+						<joint name="B_2" type="free" />
+					</body>
+
+					<body name="B_3" pos="-50 -2 0.365">
+						<geom name="B_3" type="sphere" size="0.365" rgba="0 0 1 1" mass="200" density="100" />
+						<joint name="B_3" type="free" />
+					</body>
+
+					<body name="B_4" pos="-50 -4 0.365">
+						<geom name="B_4" type="sphere" size="0.365" rgba="0 0 1 1" mass="200" density="100" />
+						<joint name="B_4" type="free" />
+					</body>
+
+					<body name="B_5" pos="-50 -6 0.365">
+						<geom name="B_5" type="sphere" size="0.365" rgba="0 0 1 1" mass="200" density="100" />
+						<joint name="B_5" type="free" />
+					</body>
 
 				</worldbody>
+
 			</mujoco>
 			'''
 
-		self.xml_player_team_A = \
-			'''
-			<body name="{name}" pos="{pos_x} {pos_y} 0.365">
-				<geom name="{name}" type="sphere" size="0.365" rgba="0 0 1 1" mass="200" density="100" />
-				<joint name="{name}" type="free" />
-			</body>
-			'''
-
-		self.xml_player_team_B = \
-			'''
-			<body name="{name}" pos="{pos_x} {pos_y} 0.365">
-				<geom name="{name}" type="sphere" size="0.365" rgba="1 0 0 1" mass="200" density="100" />
-				<joint name="{name}" type="free" />
-			</body>
-			'''
-
-		self.spawn_pos_limits_division_B = [40, 25]
-	
-	def constuct_players_team_A(self, num_players):
-		xml_team = ''
-		for i in range(num_players):
-			name = 'A_{i}'.format(i = i)
-			pos_x = np.random.uniform(-self.spawn_pos_limits_division_B[0], self.spawn_pos_limits_division_B[0])
-			pos_y = np.random.uniform(-self.spawn_pos_limits_division_B[1], self.spawn_pos_limits_division_B[1])
-			xml_team += self.xml_player_team_A.format(name = name, pos_x = pos_x, pos_y = pos_y)
-			xml_team += '\n'
-		return xml_team
-
-	def constuct_players_team_B(self, num_players):
-		xml_team = ''
-		for i in range(num_players):
-			name = 'B_{i}'.format(i = i)
-			pos_x = np.random.uniform(-self.spawn_pos_limits_division_B[0], self.spawn_pos_limits_division_B[0])
-			pos_y = np.random.uniform(-self.spawn_pos_limits_division_B[1], self.spawn_pos_limits_division_B[1])
-			xml_team += self.xml_player_team_B.format(name = name, pos_x = pos_x, pos_y = pos_y)
-			xml_team += '\n'
-		return xml_team
-
-	def construct(self, num_players_team_A, num_players_team_B):
-		xml_team_A_players = self.constuct_players_team_A(num_players_team_A)
-		xml_team_B_players = self.constuct_players_team_B(num_players_team_B)
-		xml_arena_division_b = self.xml_arena_division_b.format(TEAM_A_PLAYERS = xml_team_A_players, TEAM_B_PLAYERS = xml_team_B_players)
-		
+	def construct(self):	
 		with open('env/assets/arena_division_b.xml', 'w') as f:
-			f.write(xml_arena_division_b)
+			f.write(self.xml_arena_division_b)

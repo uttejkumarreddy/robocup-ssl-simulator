@@ -10,7 +10,10 @@ class SoccerEnvironment(Simulation):
 			cls.instance = super(SoccerEnvironment, cls).__new__(cls)
 		return cls.instance
 
-	def __init__(self, num_players_team_A, num_players_team_B, render = True):
+	def __init__(self, render = True):
+		num_players_team_A = 6
+		num_players_team_B = 6
+
 		dirname = os.path.dirname(__file__)
 		env_path = os.path.join(dirname, 'assets', 'arena_division_b.xml')
 
@@ -63,3 +66,9 @@ class SoccerEnvironment(Simulation):
 			high = observation_space_high,
 			dtype = np.float32
 		)
+
+	def reset(self):
+		pass
+
+	def step(self):
+		pass
