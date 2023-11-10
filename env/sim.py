@@ -6,6 +6,11 @@ import numpy as np
 import time
 
 class Simulation:
+	def __new__(cls, *args):
+		if not hasattr(cls, 'instance'):
+			cls.instance = super(Simulation, cls).__new__(cls)
+		return cls.instance
+
 	def __init__(self, render, env_path):
 		self.render = render
 

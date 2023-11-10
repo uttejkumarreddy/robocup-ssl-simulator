@@ -31,3 +31,6 @@ class Player:
 
 		logger = Logger()
 		logger.write("Player {0} initialized. body_id {1} geom_id {2} joint_id {3}".format(self.name, self.body_id, self.geom_id, self.joint_id))
+
+	def set_position(self, data, position):
+		data.qpos[self.joint_id * 7 : self.joint_id * 7 + 3] = position
