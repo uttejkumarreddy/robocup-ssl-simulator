@@ -1,5 +1,6 @@
 from env.sim import Simulation
 from gymnasium import spaces
+from env.arena import Arena
 
 import os
 import numpy as np
@@ -67,15 +68,17 @@ class SoccerEnvironment(Simulation):
 			dtype = np.float32
 		)
 
-	def set_players(self, team_A, team_B):
+	def set_game_elements(self, team_A, team_B, ball):
 		self.team_A = team_A
 		self.team_B = team_B
+		self.ball = ball
 
 	def get_observation_space(self):
 		pass
 
-	def reset(self, randomize = False):
-		spawn_pos_limits_division_B = [40, 25]
+	def reset(self, randomize = True):
+		current_arena_props = Arena(os.environ['FIELD_SIZE']).current_arena_props
+		spawn_pos_limits_division_B = [current_arena_props['boundary_line_length'] - 1, current_arena_props['boundary_line_width'] - 1]
 
 		if randomize is True:
 			for i in range(self.num_players_team_A):
@@ -93,6 +96,13 @@ class SoccerEnvironment(Simulation):
 					0.365
 				)
 				self.team_B[i].set_position(self.data, random_position)
+
+			random_position = (
+				np.random.uniform(-spawn_pos_limits_division_B[0], spawn_pos_limits_division_B[0]),
+				np.random.uniform(-spawn_pos_limits_division_B[1], spawn_pos_limits_division_B[1]),
+				0.215
+			)
+			self.ball.set_position(self.data, random_position)
 
 	def step(self):
 		pass

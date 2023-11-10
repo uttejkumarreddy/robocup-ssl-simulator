@@ -1,7 +1,12 @@
 import numpy as np
 
 class Arena:
-	def __init__(self):
+	def __new__(cls, *args):
+		if not hasattr(cls, 'instance'):
+			cls.instance = super(Arena, cls).__new__(cls)
+		return cls.instance
+
+	def __init__(self, size):
 		self.arena_props = {
 			'boundary_wall_length': 48,
 			'boundary_wall_width': 33,
@@ -21,6 +26,9 @@ class Arena:
 			'defence_box_arm_y_pos': 10,
 			'defence_box_main_x_pos': 35,
 		}
+
+		self.size = size
+		self.current_arena_props = self.calculate_arena_props_to_size(self.size)
 
 		self.xml_arena_division_b = \
 			'''
@@ -69,7 +77,7 @@ class Arena:
 
 					</body>
 
-					<body name="ball" pos="51 36 0.215">
+					<body name="ball" pos="0 0 0.215">
 						<geom name="ball" type="sphere" size="0.215" rgba="1 0.647 0 1" mass="2.77" friction="1" />
 						<joint name="ball" type="free" />
 					</body>
@@ -138,26 +146,28 @@ class Arena:
 			</mujoco>
 			'''
 
-	def construct(self, size = 'R'):
+	def calculate_arena_props_to_size(self, size):
 		''' Sizes 
 		R: Regular: arena_props
 		M: Medium: arena_props / 2
 		S: Small:	arena_props / 4 
 		XS: Extra Small: arena_props / 8
 		'''
-
-		xml_arena_division_b = None
+		arena_props_of_size = None
 		match size:
 			case 'R':
-				xml_arena_division_b = self.xml_arena_division_b.format(**self.arena_props)
+				arena_props_of_size = self.arena_props
 			case 'M':
-				xml_arena_division_b = self.xml_arena_division_b.format(**{k: v / 2 for k, v in self.arena_props.items()})
+				arena_props_of_size = {k: v / 2 for k, v in self.arena_props.items()}
 			case 'S':
-				xml_arena_division_b = self.xml_arena_division_b.format(**{k: v / 4 for k, v in self.arena_props.items()})
+				arena_props_of_size = {k: v / 4 for k, v in self.arena_props.items()}
 			case 'XS':
-				xml_arena_division_b = self.xml_arena_division_b.format(**{k: v / 8 for k, v in self.arena_props.items()})
+				arena_props_of_size = {k: v / 8 for k, v in self.arena_props.items()}
 			case _:
 				raise Exception('Invalid size')
+		return arena_props_of_size
 
+	def construct(self):
+		xml_arena_division_b = self.xml_arena_division_b.format(**self.current_arena_props)
 		with open('env/assets/arena_division_b.xml', 'w') as f:
 			f.write(xml_arena_division_b)

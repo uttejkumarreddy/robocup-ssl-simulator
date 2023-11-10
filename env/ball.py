@@ -10,3 +10,6 @@ class Ball:
 
 	def get_xy_position(self, data):
 		return data.qpos[self.joint_id * 7 : self.joint_id * 7 + 2]
+
+	def set_position(self, data, position):
+		data.qpos[self.joint_id * 7 : self.joint_id * 7 + 3] = position
