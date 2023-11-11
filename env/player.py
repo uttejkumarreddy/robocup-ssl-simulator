@@ -15,6 +15,7 @@ class Player:
 		self.joint_id = mj.mj_name2id(model, mj.mjtObj.mjOBJ_JOINT.value, self.name)
 
 		self.ai = ddpg.Agent(
+			name = self.name,
 			alpha = ddpg.ALPHA,
 			beta = ddpg.BETA,
 			input_dims =	[env.observation_space.shape[0]],

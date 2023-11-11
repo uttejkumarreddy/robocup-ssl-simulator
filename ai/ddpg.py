@@ -11,7 +11,7 @@ ALPHA = 0.0001 # Actor learning rate
 BETA = 0.001 # Critic learning rate
 TAU = 0.001 # Decay coefficient
 GAMMA = 0.99 # Discounted factor for reward computation
-BUFFER_SIZE = 100000 # Replay buffer max size
+BUFFER_SIZE = 500000 # Replay buffer max size
 LAYER_1_SIZE = 400 # fc1_dims
 LAYER_2_SIZE = 300 # fc2_dims
 BATCH_SIZE = 128 # Batch size
@@ -205,7 +205,8 @@ class CriticNetwork(nn.Module):
 			self.load_state_dict(T.load(self.checkpoint_file))
 
 class Agent(object):
-	def __init__(self, alpha, beta, input_dims, tau, gamma, n_actions, max_size, layer1_size, layer2_size, batch_size):
+	def __init__(self, name, alpha, beta, input_dims, tau, gamma, n_actions, max_size, layer1_size, layer2_size, batch_size):
+		self.name = name
 		self.logger = Logger()
 		self.logger.write("Initializing DDPG Agent with alpha {0} beta {1} input_dims {2} tau {3} gamma {4} n_actions {5} max_size {6} layer1_size {7} layer2_size {8} batch_size {9}".format(alpha, beta, input_dims, tau, gamma, n_actions, max_size, layer1_size, layer2_size, batch_size))
 		
