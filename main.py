@@ -12,7 +12,6 @@ num_players_team_B = 4
 size = os.environ['RSS_FIELD_SIZE']
 n_max_players = int(os.environ['RSS_N_MAX_PLAYERS'])
 
-
 env = env.make(size = size, num_players_team_A = num_players_team_A, num_players_team_B = num_players_team_B, render = True)
 
 team_a = [Player('A', 'A_{i}'.format(i = i), env) for i in range(n_max_players)]
@@ -20,10 +19,18 @@ team_b = [Player('B', 'B_{i}'.format(i = i), env) for i in range(n_max_players)]
 ball = Ball(env.model)
 
 env.set_game_elements(team_a, team_b, ball)
-env.run()
+[team_a[i].set_ai('ddpg') for i in range(num_players_team_A)]
+[team_b[i].set_ai('ddpg') for i in range(num_players_team_B)]
+players = team_a + team_b
 
 max_episodes = 10000
 for i in range(max_episodes):
-	observations, states, rewards = env.reset(randomize = True)
+	observations = env.reset_game(randomize = True)
+	while True:
+		actions = [player.ai.choose_action(observations[i]) for i, player in enumerate(players)]
+		env.step(players_actions = zip(players, actions))
+	
+	
+
 
 

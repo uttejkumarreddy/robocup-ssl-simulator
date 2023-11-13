@@ -1,6 +1,7 @@
 from env.sim import Simulation
 from gymnasium import spaces
 from env.arena import Arena
+from config import sphero as sphero_config
 
 import os
 import numpy as np
@@ -14,6 +15,7 @@ class SoccerEnvironment(Simulation):
 	def __init__(self, num_players_team_A, num_players_team_B, render = True):
 		self.num_players_team_A = num_players_team_A
 		self.num_players_team_B = num_players_team_B
+		self.render = render
 
 		dirname = os.path.dirname(__file__)
 		env_path = os.path.join(dirname, 'assets', 'arena_division_b.xml')
@@ -132,12 +134,36 @@ class SoccerEnvironment(Simulation):
 		)
 		self.ball.set_position(self.data, random_position)
 
-	def reset(self, randomize = True):
+	def reset_game(self, randomize = True):
+		super().reset()
+
 		current_arena_props = self.current_arena.current_arena_props
+
 		spawn_pos_limits_division_B = [current_arena_props['boundary_line_length'] - 1, current_arena_props['boundary_line_width'] - 1]
 		self.randomize_elements_spawn(spawn_pos_limits_division_B) if randomize is True else None
-		observations = self.get_observation_space()
-		return observations, None, None
 
-	def step(self):
-		pass
+		observations = self.get_observation_space()
+		return observations
+	
+	# TODO: Move to utils
+	def scale_linear(self, x, min, max):
+		# Linear scaling: f(x) = 0.5 * (max - min) * x + 0.5 * (max + min)
+		return (0.5 * (max - min) * x) + (0.5 * (max + min))
+
+	# TODO: Move to utils
+	def preprocess_tanh_actions(self, action):
+		# Actions are in the range [-1, 1]
+		action_speed, action_rotation = action
+		player_speed = self.scale_linear(action_speed, sphero_config.ENV_BOLT_MIN_SPEED, sphero_config.ENV_BOLT_MAX_SPEED)
+		player_rotation = self.scale_linear(action_rotation, sphero_config.ENV_BOLT_MIN_ROTATION, sphero_config.ENV_BOLT_MAX_ROTATION)
+		return player_speed, player_rotation
+	
+	def step(self, players_actions):
+		for player, action in players_actions:
+			speed, rotation = self.preprocess_tanh_actions(action)
+			player.set_heading_and_velocity(self.data, speed, rotation)
+
+		if self.render is True:
+			self.render_sim()
+
+

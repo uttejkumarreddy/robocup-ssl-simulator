@@ -6,6 +6,7 @@ import torch.optim as optim
 import numpy as np
 
 from utils.logger import Logger
+from ai.base_ai import BaseAgent
 
 ALPHA = 0.0001 # Actor learning rate
 BETA = 0.001 # Critic learning rate
@@ -204,7 +205,7 @@ class CriticNetwork(nn.Module):
 			self.logger.write("Loading checkpoint from: " + self.checkpoint_file)
 			self.load_state_dict(T.load(self.checkpoint_file))
 
-class Agent(object):
+class Agent(BaseAgent):
 	def __init__(self, name, alpha, beta, input_dims, tau, gamma, n_actions, max_size, layer1_size, layer2_size, batch_size):
 		self.name = name
 		self.logger = Logger()

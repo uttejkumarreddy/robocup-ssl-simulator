@@ -100,24 +100,19 @@ class Simulation:
 	def controller(self, model, data):
 		pass
 
-	def run(self):
-		self.reset()
-		mj.set_mjcb_control(self.controller)
-
-		while True:
-			for i in range(10):
-				mj.mj_step(self.model, self.data)
+	def render_sim(self):
+		for i in range(10):
+			mj.mj_step(self.model, self.data)
 			
-			mj.mjv_updateScene(self.model, self.data, self.opt, None, self.cam, mj.mjtCatBit.mjCAT_ALL.value, self.scene)
+		mj.mjv_updateScene(self.model, self.data, self.opt, None, self.cam, mj.mjtCatBit.mjCAT_ALL.value, self.scene)
 
-			if self.render is True:
-				viewport_width, viewport_height = glfw.get_framebuffer_size(self.window)
-				viewport = mj.MjrRect(0, 0, viewport_width, viewport_height)
+		viewport_width, viewport_height = glfw.get_framebuffer_size(self.window)
+		viewport = mj.MjrRect(0, 0, viewport_width, viewport_height)
 
-				mj.mjr_render(viewport, self.scene, self.context)
+		mj.mjr_render(viewport, self.scene, self.context)
 
-				glfw.swap_buffers(self.window)
-				glfw.poll_events()
+		glfw.swap_buffers(self.window)
+		glfw.poll_events()
 	
 	def stop(self):
 		glfw.terminate()
