@@ -33,5 +33,29 @@ class Player:
 		logger = Logger()
 		logger.write("Player {0} initialized. body_id {1} geom_id {2} joint_id {3}".format(self.name, self.body_id, self.geom_id, self.joint_id))
 
+	def get_position(self, data):
+		return data.qpos[self.joint_id * 7 : self.joint_id * 7 + 3]
+	
+	def get_xy_position(self, data):
+		return data.qpos[self.joint_id * 7 : self.joint_id * 7 + 2]
+	
 	def set_position(self, data, position):
 		data.qpos[self.joint_id * 7 : self.joint_id * 7 + 3] = position
+
+	def get_velocity(self, data):
+		return data.qvel[self.joint_id * 6 : self.joint_id * 6 + 6]
+	
+	def get_xy_velocity(self, data):
+		return data.qvel[self.joint_id * 6 : self.joint_id * 6 + 2]
+	
+	def set_velocity(self, data, velocity):
+		data.qvel[self.joint_id * 6 : self.joint_id * 6 + 3] = velocity
+
+	def get_orientation(self):
+		return [self.heading]
+
+	def get_observation(self, data):
+		# (x_pos, y_pos, x_vel, y_vel, orientation)
+		return np.concatenate((self.get_xy_position(data), self.get_xy_velocity(data), [self.heading]))
+		
+

@@ -68,20 +68,48 @@ class SoccerEnvironment(Simulation):
 			dtype = np.float32
 		)
 
+		# Arena
+		self.current_arena = Arena(os.environ['RSS_FIELD_SIZE'])
+
 	def set_game_elements(self, team_A, team_B, ball):
 		self.team_A = team_A
 		self.team_B = team_B
 		self.ball = ball
 
 	def get_observation_space(self):
-		pass
+		'''
+			proprioception: player information (x_pos, y_pos, x_vel, y_vel, orientation)
+			ball information (x_pos, y_pos, x_vel, y_vel)
+			goal positions (A_goal_top_x, A_goal_top_y, A_goal_bottom_x, A_goal_bottom_y, \
+				B_goal_top_x, B_goal_top_y, B_goal_bottom_x, B_goal_bottom_y)
+			corner positions (top_right_x, top_right_y, bottom_right_x, bottom_right_y, \
+				top_left_x, top_left_y, bottom_left_x, bottom_left_y)
+			teammates and opponents information (x_pos, y_pos, x_vel, y_vel, orientation)
+		'''
+		n_max_players = int(os.environ['RSS_N_MAX_PLAYERS'])
 
-	def reset(self, randomize = True):
-		current_arena_props = Arena(os.environ['FIELD_SIZE']).current_arena_props
-		spawn_pos_limits_division_B = [current_arena_props['boundary_line_length'] - 1, current_arena_props['boundary_line_width'] - 1]
+		team_a_obs = np.array([self.team_A[i].get_observation(self.data) for i in range(n_max_players)])
+		team_b_obs = np.array([self.team_B[i].get_observation(self.data) for i in range(n_max_players)])
+		ball_obs = self.ball.get_observation(self.data)
+		goals_pos = self.current_arena.goal_positions
+		corners_pos = self.current_arena.corner_positions
 
-		if randomize is True:
-			for i in range(self.num_players_team_A):
+		players_obs_spaces = []
+
+		for i in range(n_max_players):
+			team_a_player_i_obs_space = np.concatenate((team_a_obs[i], ball_obs, goals_pos, corners_pos,
+				np.concatenate((team_a_obs[:i].flatten(), team_a_obs[i+1:].flatten(), team_b_obs.flatten()))))
+			players_obs_spaces.append(team_a_player_i_obs_space)
+
+		for i in range(n_max_players):
+			team_b_player_i_obs_space = np.concatenate((team_b_obs[i], ball_obs, goals_pos, corners_pos,
+				np.concatenate((team_a_obs.flatten(), team_b_obs[:i].flatten(), team_b_obs[i+1:].flatten())))).flatten()
+			players_obs_spaces.append(team_b_player_i_obs_space)
+
+		return players_obs_spaces
+		
+	def randomize_elements_spawn(self, spawn_pos_limits_division_B):
+		for i in range(self.num_players_team_A):
 				random_position = (
 					np.random.uniform(-spawn_pos_limits_division_B[0], spawn_pos_limits_division_B[0]),
 					np.random.uniform(-spawn_pos_limits_division_B[1], spawn_pos_limits_division_B[1]),
@@ -89,20 +117,27 @@ class SoccerEnvironment(Simulation):
 				)
 				self.team_A[i].set_position(self.data, random_position)
 
-			for i in range(self.num_players_team_B):
-				random_position = (
-					np.random.uniform(-spawn_pos_limits_division_B[0], spawn_pos_limits_division_B[0]),
-					np.random.uniform(-spawn_pos_limits_division_B[1], spawn_pos_limits_division_B[1]),
-					0.365
-				)
-				self.team_B[i].set_position(self.data, random_position)
-
+		for i in range(self.num_players_team_B):
 			random_position = (
 				np.random.uniform(-spawn_pos_limits_division_B[0], spawn_pos_limits_division_B[0]),
 				np.random.uniform(-spawn_pos_limits_division_B[1], spawn_pos_limits_division_B[1]),
-				0.215
+				0.365
 			)
-			self.ball.set_position(self.data, random_position)
+			self.team_B[i].set_position(self.data, random_position)
+
+		random_position = (
+			np.random.uniform(-spawn_pos_limits_division_B[0], spawn_pos_limits_division_B[0]),
+			np.random.uniform(-spawn_pos_limits_division_B[1], spawn_pos_limits_division_B[1]),
+			0.215
+		)
+		self.ball.set_position(self.data, random_position)
+
+	def reset(self, randomize = True):
+		current_arena_props = self.current_arena.current_arena_props
+		spawn_pos_limits_division_B = [current_arena_props['boundary_line_length'] - 1, current_arena_props['boundary_line_width'] - 1]
+		self.randomize_elements_spawn(spawn_pos_limits_division_B) if randomize is True else None
+		observations = self.get_observation_space()
+		return observations, None, None
 
 	def step(self):
 		pass
