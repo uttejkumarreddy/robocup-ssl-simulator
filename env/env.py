@@ -2,6 +2,7 @@ from env.sim import Simulation
 from gymnasium import spaces
 from env.arena import Arena
 from config import sphero as sphero_config
+from ai import rewards as rewards_fn
 
 import os
 import numpy as np
@@ -80,6 +81,7 @@ class SoccerEnvironment(Simulation):
 
 	def get_observation_space(self):
 		'''
+			Always returns observations of all 12 players on the field regardless of whether they're in the game
 			proprioception: player information (x_pos, y_pos, x_vel, y_vel, orientation)
 			ball information (x_pos, y_pos, x_vel, y_vel)
 			goal positions (A_goal_top_x, A_goal_top_y, A_goal_bottom_x, A_goal_bottom_y, \
@@ -159,11 +161,27 @@ class SoccerEnvironment(Simulation):
 		return player_speed, player_rotation
 	
 	def step(self, players_actions):
+		if self.render is True:
+			self.render_sim()
+
 		for player, action in players_actions:
 			speed, rotation = self.preprocess_tanh_actions(action)
 			player.set_heading_and_velocity(self.data, speed, rotation)
 
-		if self.render is True:
-			self.render_sim()
+		new_observations = self.get_observation_space()
+		rewards = [rewards_fn.move_to_ball(self.data, player, self.ball) for player in self.team_A + self.team_B]
+		dones = [False for player in self.team_A + self.team_B]
+
+		contacts = self.data.contact
+		for c in contacts:
+			if c.geom1 == self.ball.geom_id and c.geom2 == self.team_A[0].geom_id \
+				or c.geom1 == self.team_A[0].geom_id and c.geom2 == self.ball.geom_id:
+				dones[0] = True
+
+		info = {}
+
+		return new_observations, rewards, dones, info
+
+
 
 

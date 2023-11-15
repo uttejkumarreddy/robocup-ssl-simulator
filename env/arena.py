@@ -168,6 +168,8 @@ class Arena:
 				arena_props_of_size = {k: v / 8 for k, v in self.arena_props.items()}
 			case _:
 				raise Exception('Invalid size')
+		
+		arena_props_of_size['goal_height'] = self.arena_props['goal_height']
 		return arena_props_of_size
 	
 	def get_goal_positions(self):

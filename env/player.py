@@ -2,7 +2,7 @@ import mujoco as mj
 import numpy as np
 import math
 
-from ai import ddpg
+from ai.ddpg import ddpg
 from ai.dummy_ai import DummyAgent
 from utils.logger import Logger
 
@@ -75,6 +75,7 @@ class Player:
 					layer2_size = ddpg.LAYER_2_SIZE,
 					batch_size = ddpg.BATCH_SIZE,
 				)
+				self.ai.load_models()
 			case _:
 				raise Exception('AI: {0} not implemented '.format(ai))
 
