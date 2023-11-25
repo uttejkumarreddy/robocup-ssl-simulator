@@ -32,7 +32,7 @@ class ReplayBuffer:
 		return states, actions, rewards, states_, terminal
 
 	def save_checkpoint(self):
-		np.save('replay_buffer.npy', [self.state_memory, self.new_state_memory, self.action_memory, self.reward_memory, self.terminal_memory, self.mem_cntr])
+		pass
 
 	def load_checkpoint(self):
-		self.state_memory, self.new_state_memory, self.action_memory, self.reward_memory, self.terminal_memory, self.mem_cntr = np.load('replay_buffer.npy', allow_pickle = True)
+		pass
