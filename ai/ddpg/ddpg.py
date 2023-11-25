@@ -122,9 +122,11 @@ class Agent(BaseAgent):
 		self.target_actor.save_checkpoint()
 		self.critic.save_checkpoint()
 		self.target_critic.save_checkpoint()
+		self.memory.save_checkpoint()
 
 	def load_models(self):
 		self.actor.load_checkpoint()
 		self.target_actor.load_checkpoint()
 		self.critic.load_checkpoint()
 		self.target_critic.load_checkpoint()
+		self.memory.load_checkpoint()

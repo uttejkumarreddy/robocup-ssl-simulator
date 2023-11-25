@@ -5,7 +5,7 @@ import env
 import os
 import time
 
-os.environ['RSS_FIELD_SIZE'] = 'XS' # [XS, S, M, R]
+os.environ['RSS_FIELD_SIZE'] = 'S' # [XS, S, M, R]
 os.environ['RSS_N_MAX_PLAYERS'] = '6'
 num_players_team_A = 1
 num_players_team_B = 0
@@ -38,7 +38,7 @@ for i in range(max_episodes):
 
 		[player.ai.learn() for player in players]
 
-		if any(dones) or (time.time() - episode_start_time > 45):
+		if any(dones) or (time.time() - episode_start_time > 135):
 			break
 
 	if i % 10 == 0:

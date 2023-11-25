@@ -6,6 +6,7 @@ from ai import rewards as rewards_fn
 
 import os
 import numpy as np
+import mujoco as mj
 
 class SoccerEnvironment(Simulation):
 	def __new__(cls, *args):
@@ -73,6 +74,9 @@ class SoccerEnvironment(Simulation):
 
 		# Arena
 		self.current_arena = Arena(os.environ['RSS_FIELD_SIZE'])
+
+		self.team_A_goal = mj.mj_name2id(self.model, mj.mjtObj.mjOBJ_GEOM, 'line_goalE')
+		self.team_B_goal = mj.mj_name2id(self.model, mj.mjtObj.mjOBJ_GEOM, 'line_goalW')
 
 	def set_game_elements(self, team_A, team_B, ball):
 		self.team_A = team_A
@@ -169,14 +173,12 @@ class SoccerEnvironment(Simulation):
 			player.set_heading_and_velocity(self.data, speed, rotation)
 
 		new_observations = self.get_observation_space()
-		rewards = [rewards_fn.move_to_ball(self.data, player, self.ball) for player in self.team_A + self.team_B]
-		dones = [False for player in self.team_A + self.team_B]
 
-		contacts = self.data.contact
-		for c in contacts:
-			if c.geom1 == self.ball.geom_id and c.geom2 == self.team_A[0].geom_id \
-				or c.geom1 == self.team_A[0].geom_id and c.geom2 == self.ball.geom_id:
-				dones[0] = True
+		rewards, dones = [], []
+		for player in self.team_A + self.team_B:
+			reward, done = rewards_fn.score_goal(self.data, player, self.ball, self.team_A_goal, self.team_B_goal, self.current_arena.current_arena_props['boundary_line_length'])
+			rewards.append(reward)
+			dones.append(done)
 
 		info = {}
 
