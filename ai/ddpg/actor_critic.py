@@ -73,7 +73,7 @@ class ActorNetwork(nn.Module):
 	def load_checkpoint(self):
 		if os.path.isfile(self.checkpoint_file):
 			self.logger.write("Loading checkpoint from: " + self.checkpoint_file)
-			self.load_state_dict(T.load(self.checkpoint_file))
+			self.load_state_dict(T.load(self.checkpoint_file, map_location=self.device))
 
 class CriticNetwork(nn.Module):
 	def __init__(
@@ -139,4 +139,4 @@ class CriticNetwork(nn.Module):
 	def load_checkpoint(self):
 		if os.path.isfile(self.checkpoint_file):
 			self.logger.write("Loading checkpoint from: " + self.checkpoint_file)
-			self.load_state_dict(T.load(self.checkpoint_file))
+			self.load_state_dict(T.load(self.checkpoint_file, map_location=self.device))
