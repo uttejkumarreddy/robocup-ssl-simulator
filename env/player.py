@@ -2,7 +2,6 @@ import mujoco as mj
 import numpy as np
 import math
 
-from ai.ddpg import ddpg
 from ai.dummy_ai import DummyAgent
 from utils.logger import Logger
 
@@ -59,25 +58,7 @@ class Player:
 		return np.concatenate((self.get_xy_position(data), self.get_xy_velocity(data), [self.heading]))
 	
 	def set_ai(self, ai):
-		match ai:
-			case 'ddpg':
-				self.ai_name = 'ddpg'
-				self.ai = ddpg.Agent(
-					name = self.name,
-					alpha = ddpg.ALPHA,
-					beta = ddpg.BETA,
-					input_dims = [self.env.observation_space.shape[0]],
-					tau = ddpg.TAU,
-					gamma = ddpg.GAMMA,
-					n_actions = self.env.action_space.shape[0],
-					max_size = ddpg.BUFFER_SIZE,
-					layer1_size = ddpg.LAYER_1_SIZE,
-					layer2_size = ddpg.LAYER_2_SIZE,
-					batch_size = ddpg.BATCH_SIZE,
-				)
-				self.ai.load_models()
-			case _:
-				raise Exception('AI: {0} not implemented '.format(ai))
+		pass
 
 		
 

@@ -5,10 +5,10 @@ import env
 import os
 import time
 
-os.environ['RSS_FIELD_SIZE'] = 'S' # [XS, S, M, R]
-os.environ['RSS_N_MAX_PLAYERS'] = '6'
-num_players_team_A = 1
-num_players_team_B = 0
+os.environ['RSS_FIELD_SIZE'] = 'M' # [XS, S, M, R]
+os.environ['RSS_N_MAX_PLAYERS'] = '3'
+num_players_team_A = 3
+num_players_team_B = 3
 
 size = os.environ['RSS_FIELD_SIZE']
 n_max_players = int(os.environ['RSS_N_MAX_PLAYERS'])

@@ -100,21 +100,6 @@ class Arena:
 						<joint name="A_2" type="free" />
 					</body>
 
-					<body name="A_3" pos="50 -2 0.365">
-						<geom name="A_3" type="sphere" size="0.365" rgba="1 0 0 1" mass="200" density="100" />
-						<joint name="A_3" type="free" />
-					</body>
-
-					<body name="A_4" pos="50 -4 0.365">
-						<geom name="A_4" type="sphere" size="0.365" rgba="1 0 0 1" mass="200" density="100" />
-						<joint name="A_4" type="free" />
-					</body>
-
-					<body name="A_5" pos="50 -6 0.365">
-						<geom name="A_5" type="sphere" size="0.365" rgba="1 0 0 1" mass="200" density="100" />
-						<joint name="A_5" type="free" />
-					</body>
-
 					<body name="B_0" pos="-50 0 0.365">
 						<geom name="B_0" type="sphere" size="0.365" rgba="0 0 1 1" mass="200" density="100" />
 						<joint name="B_0" type="free" />
@@ -128,21 +113,6 @@ class Arena:
 					<body name="B_2" pos="-50 4 0.365">
 						<geom name="B_2" type="sphere" size="0.365" rgba="0 0 1 1" mass="200" density="100" />
 						<joint name="B_2" type="free" />
-					</body>
-
-					<body name="B_3" pos="-50 -2 0.365">
-						<geom name="B_3" type="sphere" size="0.365" rgba="0 0 1 1" mass="200" density="100" />
-						<joint name="B_3" type="free" />
-					</body>
-
-					<body name="B_4" pos="-50 -4 0.365">
-						<geom name="B_4" type="sphere" size="0.365" rgba="0 0 1 1" mass="200" density="100" />
-						<joint name="B_4" type="free" />
-					</body>
-
-					<body name="B_5" pos="-50 -6 0.365">
-						<geom name="B_5" type="sphere" size="0.365" rgba="0 0 1 1" mass="200" density="100" />
-						<joint name="B_5" type="free" />
 					</body>
 
 				</worldbody>
