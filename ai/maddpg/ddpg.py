@@ -54,11 +54,11 @@ class Agent:
 
 		return actions.detach().cpu().numpy()
 
-	def save_models(self):
-		self.actor.save_checkpoint()
-		self.target_actor.save_checkpoint()
-		self.critic.save_checkpoint()
-		self.target_critic.save_checkpoint()
+	def save_models(self, is_best = False):
+		self.actor.save_checkpoint(is_best = is_best)
+		self.target_actor.save_checkpoint(is_best = is_best)
+		self.critic.save_checkpoint(is_best = is_best)
+		self.target_critic.save_checkpoint(is_best = is_best)
 
 	def load_models(self):
 		self.actor.load_checkpoint()

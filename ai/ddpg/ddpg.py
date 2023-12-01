@@ -5,19 +5,17 @@ import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
 
-from Utilities.Logger import Logger
-
 ALPHA = 0.0001		    # Actor learning rate
 BETA = 0.001			# Critic learning rate
 TAU = 0.001			# Decay coefficient
 GAMMA = 0.99			# Discounted factor for reward computation
-BUFFER_SIZE = 1000000	# Replay buffer max size
+BUFFER_SIZE = 500000	# Replay buffer max size
 LAYER_1_SIZE = 400		# fc1_dims
 LAYER_2_SIZE = 300		# fc2_dims
 BATCH_SIZE = 128			# Batch size
 
 # Checkpoint Directories
-DDPG_CHKPT_DIR = "Checkpoints/DDPG/"
+DDPG_CHKPT_DIR = "checkpoints/ddpg/"
 
 class OUActionNoise(object):
 	def __init__(self, mu, sigma = 0.15, theta = 0.2, dt = 1e-2, x0 = None):
@@ -86,12 +84,11 @@ class ActorNetwork(nn.Module):
 	):
 		super(ActorNetwork, self).__init__()
 
-		self.logger = Logger()
-
 		self.input_dims = input_dims
 		self.n_actions = n_actions
 		self.fc1_dims = fc1_dims
 		self.fc2_dims = fc2_dims
+		self.chkpt_dir = chkpt_dir
 		self.checkpoint_file = os.path.join(chkpt_dir, name + "_ddpg")
 
 		self.fc1 = nn.Linear(*self.input_dims, self.fc1_dims)
@@ -131,12 +128,11 @@ class ActorNetwork(nn.Module):
 		return x
 
 	def save_checkpoint(self):
-		self.logger.write("Saving checkpoint to: " + self.checkpoint_file)
+		os.makedirs(self.chkpt_dir, exist_ok=True)
 		T.save(self.state_dict(), self.checkpoint_file)
 
 	def load_checkpoint(self):
 		if os.path.isfile(self.checkpoint_file):
-			self.logger.write("Loading checkpoint from: " + self.checkpoint_file)
 			self.load_state_dict(T.load(self.checkpoint_file))
 
 class CriticNetwork(nn.Module):
@@ -152,12 +148,11 @@ class CriticNetwork(nn.Module):
 	):
 		super(CriticNetwork, self).__init__()
 
-		self.logger = Logger()
-
 		self.input_dims = input_dims
 		self.fc1_dims = fc1_dims
 		self.fc2_dims = fc2_dims
 		self.n_actions = n_actions
+		self.chkpt_dir = chkpt_dir
 		self.checkpoint_file = os.path.join(chkpt_dir, name + "_ddpg")
 
 		self.fc1 = nn.Linear(*self.input_dims, self.fc1_dims)
@@ -197,19 +192,15 @@ class CriticNetwork(nn.Module):
 		return state_action_value
 
 	def save_checkpoint(self):
-		self.logger.write("Saving checkpoint to: " + self.checkpoint_file)
+		os.makedirs(self.chkpt_dir, exist_ok=True)
 		T.save(self.state_dict(), self.checkpoint_file)
 
 	def load_checkpoint(self):
 		if os.path.isfile(self.checkpoint_file):
-			self.logger.write("Loading checkpoint from: " + self.checkpoint_file)
 			self.load_state_dict(T.load(self.checkpoint_file))
 
 class Agent(object):
-	def __init__(self, alpha, beta, input_dims, tau, gamma, n_actions, max_size, layer1_size, layer2_size, batch_size):
-		self.logger = Logger()
-		self.logger.write("Initializing DDPG Agent with alpha {0} beta {1} input_dims {2} tau {3} gamma {4} n_actions {5} max_size {6} layer1_size {7} layer2_size {8} batch_size {9}".format(alpha, beta, input_dims, tau, gamma, n_actions, max_size, layer1_size, layer2_size, batch_size))
-		
+	def __init__(self, name, alpha, beta, input_dims, tau, gamma, n_actions, max_size, layer1_size, layer2_size, batch_size):		
 		self.gamma = gamma
 		self.tau = tau
 		self.memory = ReplayBuffer(max_size, input_dims, n_actions)

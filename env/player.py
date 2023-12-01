@@ -3,6 +3,7 @@ import numpy as np
 import math
 
 from ai.dummy_ai import DummyAgent
+from ai.ddpg import ddpg
 from utils.logger import Logger
 
 class Player:
@@ -20,7 +21,7 @@ class Player:
 		self.heading = np.random.uniform(-np.pi, np.pi)
 
 		self.ai_name = None
-		self.ai = DummyAgent()
+		self.ai = None
 
 		logger = Logger()
 		logger.write("Player {0} initialized. body_id {1} geom_id {2} joint_id {3}".format(self.name, self.body_id, self.geom_id, self.joint_id))
@@ -56,3 +57,25 @@ class Player:
 	def get_observation(self, data):
 		# (x_pos, y_pos, x_vel, y_vel, orientation)
 		return np.concatenate((self.get_xy_position(data), self.get_xy_velocity(data), [self.heading]))
+
+	def set_ai(self, ai):
+		match ai:
+			case 'ddpg':
+				self.ai_name = 'ddpg'
+				self.ai = ddpg.Agent(
+					name = self.name,
+					alpha = ddpg.ALPHA,
+					beta = ddpg.BETA,
+					input_dims = [self.env.observation_space.shape[0]],
+					tau = ddpg.TAU,
+					gamma = ddpg.GAMMA,
+					n_actions = self.env.action_space.shape[0],
+					max_size = ddpg.BUFFER_SIZE,
+					layer1_size = ddpg.LAYER_1_SIZE,
+					layer2_size = ddpg.LAYER_2_SIZE,
+					batch_size = ddpg.BATCH_SIZE,
+				)
+				self.ai.load_models()
+			case _:
+				raise Exception('AI: {0} not implemented '.format(ai))
+		pass

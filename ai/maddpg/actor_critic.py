@@ -10,6 +10,7 @@ class ActorNetwork(nn.Module):
 		super(ActorNetwork, self).__init__()
 
 		self.fc1_dims, self.fc2_dims = fc1_dims, fc2_dims
+		self.name = name
 		self.chkpt_dir = chkpt_dir
 		self.chkpt_file = os.path.join(chkpt_dir, name)
 
@@ -28,9 +29,14 @@ class ActorNetwork(nn.Module):
 
 		return mu
 
-	def save_checkpoint(self):
-		os.makedirs(self.chkpt_dir, exist_ok=True)
-		T.save(self.state_dict(), self.chkpt_file)
+	def save_checkpoint(self, is_best):
+		chkpt_dir = self.chkpt_dir
+		chkpt_file = self.chkpt_file
+		if is_best is True:
+			chkpt_dir = self.chkpt_dir + '/best'
+			chkpt_file = os.path.join(chkpt_dir, self.name)
+		os.makedirs(chkpt_dir, exist_ok=True)
+		T.save(self.state_dict(), chkpt_file)
 
 	def load_checkpoint(self):
 		if os.path.exists(self.chkpt_file):
@@ -41,6 +47,7 @@ class CriticNetwork(nn.Module):
 		super(CriticNetwork, self).__init__()
 
 		self.fc1_dims, self.fc2_dims = fc1_dims, fc2_dims
+		self.name = name
 		self.chkpt_dir = chkpt_dir
 		self.chkpt_file = os.path.join(chkpt_dir, name)
 
@@ -59,9 +66,14 @@ class CriticNetwork(nn.Module):
 
 		return q
 
-	def save_checkpoint(self):
-		os.makedirs(self.chkpt_dir, exist_ok=True)
-		T.save(self.state_dict(), self.chkpt_file)
+	def save_checkpoint(self, is_best = False):
+		chkpt_dir = self.chkpt_dir
+		chkpt_file = self.chkpt_file
+		if is_best is True:
+			chkpt_dir = self.chkpt_dir + '/best'
+			chkpt_file = os.path.join(chkpt_dir, self.name)
+		os.makedirs(chkpt_dir, exist_ok=True)
+		T.save(self.state_dict(), chkpt_file)
 
 	def load_checkpoint(self):
 		if os.path.exists(self.chkpt_file):

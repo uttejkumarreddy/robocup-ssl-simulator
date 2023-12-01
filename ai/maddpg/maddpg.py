@@ -28,9 +28,9 @@ class MADDPG:
 				)
 			)
 		
-	def save_checkpoints(self):
+	def save_checkpoints(self, is_best = False):
 		for agent in self.agents:
-			agent.save_models()
+			agent.save_models(is_best = is_best)
 
 	def load_checkpoints(self):
 		for agent in self.agents:
