@@ -85,12 +85,13 @@ class MADDPG:
 			critic_loss = F.mse_loss(target, critic_value)
 			agent.critic.optimizer.zero_grad()
 			critic_loss.backward(retain_graph = True)
-			agent.critic.optimizer.step()
 
 			actor_loss = agent.critic.forward(states, mu).flatten()
 			actor_loss = -T.mean(actor_loss)
 			agent.actor.optimizer.zero_grad()
-			agent.loss.backward(retain_graph = True)
-			agent.actor.optimizer.step()
+			actor_loss.backward(retain_graph = True)
 
+		for agent in self.agents:
+			agent.critic.optimizer.step()
+			agent.actor.optimizer.step()
 			agent.update_network_parameters()
