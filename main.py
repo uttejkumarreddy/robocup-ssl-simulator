@@ -25,8 +25,8 @@ if __name__ == '__main__':
 	os.environ['RSS_N_MAX_PLAYERS'] = '3'
 
 	env = env.make(size = size, num_players_team_A = num_players_team_A, num_players_team_B = num_players_team_B, render = True)
-	team_a = [Player('A', 'A_{i}'.format(i = i), env) for i in range(num_players_team_A)]
-	team_b = [Player('B', 'B_{i}'.format(i = i), env) for i in range(num_players_team_B)]
+	team_a = [Player('A', 'A_{i}'.format(i = i), env) for i in range(num_players_team_A)] # Red Team
+	team_b = [Player('B', 'B_{i}'.format(i = i), env) for i in range(num_players_team_B)] # Blue Team
 	ball = Ball(env.model)
 	env.set_game_elements(team_a, team_b, ball)
 	
