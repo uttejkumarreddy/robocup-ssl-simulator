@@ -13,13 +13,10 @@ def move_to_ball(data, player, ball):
 
 	return 0.05 * reward_vel_to_ball
 
-def score_goal(data, player, ball, geom_team_A_goal, geom_team_B_goal, goal_pos_x):
+def score_goal(data, player, ball_geom_id, ball_position, ball_velocity, geom_team_A_goal, geom_team_B_goal, goal_pos_x):
 	''' Reward player for moving closer to ball and pushing ball into goal '''
 	player_position = player.get_xy_position(data)
 	player_velocity = player.get_xy_velocity(data)
-
-	ball_position = ball.get_xy_position(data)
-	ball_velocity = ball.get_xy_velocity(data)
 
 	# vel-player-to-ball: player's linear velocity projected onto its unit direction vector towards the ball, thresholded at zero
 	player_to_ball_unit_vector = (ball_position - player_position) / np.linalg.norm(ball_position - player_position)
@@ -34,13 +31,13 @@ def score_goal(data, player, ball, geom_team_A_goal, geom_team_B_goal, goal_pos_
 	reward_goal = 0
 	contacts = data.contact
 	for c in contacts:
-		if c.geom1 == ball.geom_id and c.geom2 == geom_team_A_goal \
-			or c.geom1 == geom_team_A_goal and c.geom2 == ball.geom_id:
+		if c.geom1 == ball_geom_id and c.geom2 == geom_team_A_goal \
+			or c.geom1 == geom_team_A_goal and c.geom2 == ball_geom_id:
 			reward_goal = 1 if player.team == 'A' else -1
-		elif c.geom1 == ball.geom_id and c.geom2 == geom_team_B_goal \
-			or c.geom1 == geom_team_B_goal and c.geom2 == ball.geom_id:
+		elif c.geom1 == ball_geom_id and c.geom2 == geom_team_B_goal \
+			or c.geom1 == geom_team_B_goal and c.geom2 == ball_geom_id:
 			reward_goal = -1 if player.team == 'A' else 1
 
 	done = True if reward_goal != 0 else False
 
-	return reward_goal + (0.05 * reward_vel_to_ball) + (0.1 * reward_vel_ball_to_goal), done
+	return reward_goal + (0.05 * reward_vel_to_ball) + (0.1 * reward_vel_ball_to_goal), done  

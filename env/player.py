@@ -56,9 +56,3 @@ class Player:
 	def get_observation(self, data):
 		# (x_pos, y_pos, x_vel, y_vel, orientation)
 		return np.concatenate((self.get_xy_position(data), self.get_xy_velocity(data), [self.heading]))
-	
-	def set_ai(self, ai):
-		pass
-
-		
-

@@ -3,20 +3,25 @@ import torch as T
 import torch.nn.functional as F
 import torch.optim as optim
 
+from ai.maddpg.ddpg import Agent
+
 class MADDPG:
-	def __init__(self, actor_dims, critic_dims, n_agents, n_actions, scenario = 'xs_1v0', alpha = 0.01, beta = 0.01, fc1 = 64, fc2 = 64, gamma = 0.99, tau = 0.01, chkpt_dir = 'checkpoints/maddpg/'):
+	def __init__(self, actor_dims, critic_dims, n_agents, n_actions, scenario = 'xs_1v0', alpha = 0.01, beta = 0.01, fc1 = 400, fc2 = 300, gamma = 0.99, tau = 0.01, chkpt_dir = 'checkpoints/maddpg/'):
 		self.agents = []
 		self.n_agents = n_agents
 		self.n_actions = n_actions
 		chkpt_dir += scenario
 
 		for agent_idx in range(self.n_agents):
+			agent_team = 'A' if agent_idx < self.n_agents // 2 else 'B'
 			self.agents.append(
 				Agent(
 					actor_dims[agent_idx],
 					critic_dims,
+					n_agents,
 					n_actions,
-					agent_idx,
+					agent_team,
+					agent_idx = agent_idx,
 					alpha = alpha,
 					beta = beta,
 					chkpt_dir = chkpt_dir

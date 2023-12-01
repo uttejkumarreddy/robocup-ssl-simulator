@@ -9,6 +9,7 @@ class ActorNetwork(nn.Module):
 	def __init__(self, alpha, input_dims, fc1_dims, fc2_dims, n_actions, name, chkpt_dir):
 		super(ActorNetwork, self).__init__()
 
+		self.fc1_dims, self.fc2_dims = fc1_dims, fc2_dims
 		self.chkpt_file = os.path.join(chkpt_dir, name)
 
 		self.fc1 = nn.Linear(input_dims, fc1_dims)
@@ -22,7 +23,7 @@ class ActorNetwork(nn.Module):
 	def forward(self, state):
 		x = F.relu(self.fc1(state))
 		x = F.relu(self.fc2(x))
-		mu = T.tanh(self.mu(x), dim = 1)
+		mu = T.tanh(self.mu(x))
 
 		return mu
 
@@ -30,12 +31,14 @@ class ActorNetwork(nn.Module):
 		T.save(self.state_dict(), self.chkpt_file)
 
 	def load_checkpoint(self):
-		self.load_state_dict(T.load(self.chkpt_file, map_location = self.device))
+		if os.path.exists(self.chkpt_file):
+			self.load_state_dict(T.load(self.chkpt_file, map_location = self.device))
 
 class CriticNetwork(nn.Module):
 	def __init__(self, beta, input_dims, fc1_dims, fc2_dims, n_agents, n_actions, name, chkpt_dir):
 		super(CriticNetwork, self).__init__()
 
+		self.fc1_dims, self.fc2_dims = fc1_dims, fc2_dims
 		self.chkpt_file = os.path.join(chkpt_dir, name)
 
 		self.fc1 = nn.Linear(input_dims + (n_actions * n_agents), fc1_dims)
@@ -57,4 +60,5 @@ class CriticNetwork(nn.Module):
 		T.save(self.state_dict(), self.chkpt_file)
 
 	def load_checkpoint(self):
-		self.load_state_dict(T.load(self.chkpt_file, map_location = self.device))
+		if os.path.exists(self.chkpt_file):
+			self.load_state_dict(T.load(self.chkpt_file, map_location = self.device))

@@ -17,6 +17,7 @@ class SoccerEnvironment(Simulation):
 	def __init__(self, num_players_team_A, num_players_team_B, render = True):
 		self.num_players_team_A = num_players_team_A
 		self.num_players_team_B = num_players_team_B
+		self.n = num_players_team_A + num_players_team_B
 		self.render = render
 
 		dirname = os.path.dirname(__file__)
@@ -55,7 +56,7 @@ class SoccerEnvironment(Simulation):
 			ball_information_low,
 			goal_positions_low,
 			corner_positions_low,
-			np.tile(player_information_low, 11),
+			np.tile(player_information_low, self.n - 1),
 		))
 
 		observation_space_high = np.concatenate((
@@ -63,7 +64,7 @@ class SoccerEnvironment(Simulation):
 			ball_information_high,
 			goal_positions_high,
 			corner_positions_high,
-			np.tile(player_information_high, 11),
+			np.tile(player_information_high, self.n - 1),
 		))
 
 		self.observation_space = spaces.Box(
@@ -85,7 +86,6 @@ class SoccerEnvironment(Simulation):
 
 	def get_observation_space(self):
 		'''
-			Always returns observations of all 12 players on the field regardless of whether they're in the game
 			proprioception: player information (x_pos, y_pos, x_vel, y_vel, orientation)
 			ball information (x_pos, y_pos, x_vel, y_vel)
 			goal positions (A_goal_top_x, A_goal_top_y, A_goal_bottom_x, A_goal_bottom_y, \
@@ -165,18 +165,20 @@ class SoccerEnvironment(Simulation):
 		return player_speed, player_rotation
 	
 	def step(self, players_actions):
-		if self.render is True:
-			self.render_sim()
-
 		for player, action in players_actions:
-			speed, rotation = self.preprocess_tanh_actions(action)
+			speed, rotation = self.preprocess_tanh_actions(action[0])
 			player.set_heading_and_velocity(self.data, speed, rotation)
 
 		new_observations = self.get_observation_space()
 
 		rewards, dones = [], []
+
+		ball_geom_id = self.ball.geom_id
+		ball_pos = self.ball.get_xy_position(self.data)
+		ball_vel = self.ball.get_xy_velocity(self.data)
+		
 		for player in self.team_A + self.team_B:
-			reward, done = rewards_fn.score_goal(self.data, player, self.ball, self.team_A_goal, self.team_B_goal, self.current_arena.current_arena_props['boundary_line_length'])
+			reward, done = rewards_fn.score_goal(self.data, player, ball_geom_id, ball_pos, ball_vel, self.team_A_goal, self.team_B_goal, self.current_arena.current_arena_props['boundary_line_length'])
 			rewards.append(reward)
 			dones.append(done)
 
