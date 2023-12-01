@@ -10,6 +10,7 @@ class ActorNetwork(nn.Module):
 		super(ActorNetwork, self).__init__()
 
 		self.fc1_dims, self.fc2_dims = fc1_dims, fc2_dims
+		self.chkpt_dir = chkpt_dir
 		self.chkpt_file = os.path.join(chkpt_dir, name)
 
 		self.fc1 = nn.Linear(input_dims, fc1_dims)
@@ -28,6 +29,7 @@ class ActorNetwork(nn.Module):
 		return mu
 
 	def save_checkpoint(self):
+		os.makedirs(self.chkpt_dir, exist_ok=True)
 		T.save(self.state_dict(), self.chkpt_file)
 
 	def load_checkpoint(self):
@@ -39,6 +41,7 @@ class CriticNetwork(nn.Module):
 		super(CriticNetwork, self).__init__()
 
 		self.fc1_dims, self.fc2_dims = fc1_dims, fc2_dims
+		self.chkpt_dir = chkpt_dir
 		self.chkpt_file = os.path.join(chkpt_dir, name)
 
 		self.fc1 = nn.Linear(input_dims + (n_actions * n_agents), fc1_dims)
@@ -57,6 +60,7 @@ class CriticNetwork(nn.Module):
 		return q
 
 	def save_checkpoint(self):
+		os.makedirs(self.chkpt_dir, exist_ok=True)
 		T.save(self.state_dict(), self.chkpt_file)
 
 	def load_checkpoint(self):
